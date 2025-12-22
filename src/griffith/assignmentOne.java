@@ -160,7 +160,7 @@ public class assignmentOne {
 									}
 
 									//System.out.println("1.Basic Attack, 2.Special Attack"); // TODO make this into ASCII later
-									//TODO make it so special attack can be used per 1-3 basic attacks
+									
 									int attack_choice = 0;
 
 									try{
