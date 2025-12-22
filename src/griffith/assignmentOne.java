@@ -29,9 +29,11 @@ public class assignmentOne {
 		return updated_fighter_list;
 	}
 
-	public static void basicAttack(Fighter attacker, Fighter defender){
+	public static void basicAttack(Fighter attacker, Fighter defender, boolean count){
 		defender.setHp(defender.getHp() - (attacker.getAtk() / defender.getDef()));
-		
+		if(count){
+			attacker.setBasicAttackCount(attacker.getBasicAttacksCount() + 1);
+		}
 	}
 
 	public static void specialAttack(Fighter attacker, Fighter defender){
@@ -45,12 +47,12 @@ public class assignmentOne {
 		}
 		else if (attacker.getChampion().equals("Kayn")){
 			defender.setDef(defender.getDef() - 1); // maybe modify how much defence they lose later on. TODO also fix ArithmeticException :3
-			basicAttack(attacker, defender);
+			basicAttack(attacker, defender, NO_METER);
 			
 		}
 		else if (attacker.getChampion().equals("Pantheon")){
 			attacker.setAtk(attacker.getAtk() + 5); // maybe modify how much attack they gain later on
-			basicAttack(attacker, defender);
+			basicAttack(attacker, defender, NO_METER);
 		}
 
 		//continue
@@ -60,6 +62,11 @@ public class assignmentOne {
 	//static int random_fighter = new Random().nextInt(1,5); 
 	
 	static String[] available_attacks = {"Basic attack", "Special attack"};
+
+	static int basic_attacks_needed = 3;
+
+	final static boolean COUNT_METER = true;
+	final static boolean NO_METER = false;
 
 	public static void main(String[] args){
 
@@ -141,7 +148,7 @@ public class assignmentOne {
 								Fighter bot_figther = new Fighter(100, 10, 5, fighter_options[random_fighter]);
 
 								do{
-									System.out.println(String.format("\nTurn %s", (turn++)));
+									System.out.println(String.format("\nTurn %s", (turn++))); //TODO the counter shouldn't go up in case of a triggered check/error that doesn't allow the player or bot to attack
 
 
 									//ask player what attack they wanna use: basic, special etc
@@ -165,25 +172,60 @@ public class assignmentOne {
 										continue;
 									}
 									scanner.nextLine();
+									
+									/*if attack choice = 2 while basic attack meters inst 3, give user error message telling them to basic attack */
+
 
 									if(attack_choice > 0 && attack_choice <=2){ //TODO adjust attack_choice range once we got all the attack types
 										switch(attack_choice){ //player attacks
 											case 1 ->{
-												basicAttack(player_figther, bot_figther);
+												basicAttack(player_figther, bot_figther, COUNT_METER);
+												//player_figther.setBasicAttackCount(player_figther.getBasicAttacksCount() + 1);
+												System.out.println("basic attack count is: "+player_figther.getBasicAttacksCount()); //remove after testing is complete
 												break;
 											}
 
 											case 2 ->{
-												specialAttack(player_figther, bot_figther);
+												if(player_figther.getBasicAttacksCount() != basic_attacks_needed){
+													//System.out.println(String.format("\nPlease use %s basic attacks first.\n", basic_attacks_needed));
+													 //will reset basic attack counter
+													continue;
+												}
+												else{
+													specialAttack(player_figther, bot_figther);
+													player_figther.setBasicAttackCount(player_figther.getBasicAttacksCount() - basic_attacks_needed); // special attacks consume the basic-attack meter
+
+													//System.out.println("basic attack count value after special attack is: " + player_figther.getBasicAttacksCount());
+												}
+												
 												break;
 											}
 										
 										}
 
-										int random_attack = new Random().nextInt(0,2); //TODO adjust range once all attacks have been added. num range 0-1. consider moving it to main while loop
+										int random_attack = new Random().nextInt(1,3); //TODO adjust range once all attacks have been added. num range 1-2. consider moving it to main while loop
+										switch (random_attack) {
+											case 1 -> {
+												basicAttack(bot_figther, player_figther, COUNT_METER);
+												break;
 
-										basicAttack(bot_figther, player_figther);
-										System.out.println(String.format("Bot chose to use %s!\n", available_attacks[random_attack]));
+
+											}
+											case 2 -> {
+												if(bot_figther.getBasicAttacksCount() !=basic_attacks_needed){
+													basicAttack(bot_figther, player_figther, COUNT_METER);
+												}
+												else{												
+													specialAttack(bot_figther, player_figther);
+													bot_figther.setBasicAttackCount(bot_figther.getBasicAttacksCount() - basic_attacks_needed); // special attacks consume the basic-attack meter
+
+
+												}
+												break;
+
+											}
+										}
+										System.out.println(String.format("Bot chose to use %s!\n", available_attacks[random_attack-1]));
 									}
 									else{
 										System.out.println("Please choose a viable attack!");
