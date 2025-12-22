@@ -59,6 +59,7 @@ public class assignmentOne {
 
 	//static int random_fighter = new Random().nextInt(1,5); 
 	
+	static String[] available_attacks = {"Basic attack", "Special attack"};
 
 	public static void main(String[] args){
 
@@ -120,12 +121,13 @@ public class assignmentOne {
 								int fighter_choice = 0;
 								
 								try{
-									fighter_choice = scanner.nextInt() - 1;
+									fighter_choice = scanner.nextInt() - 1; //TODO this line could be giving IndexOutOfBoundException, please have a look
+									System.out.println("This is the value of fighter choice: "+ fighter_choice + "\n");
 								}
 								catch(InputMismatchException e){
-									System.out.println("\nPlease use numbers for the menu choice.");
+									System.out.println("\nPlease use numbers for the fighter choice!");
 									scanner.nextLine();
-									continue;
+									continue; // TODO maybe make the player go back to the start of this case instead of menu 
 								}
 								scanner.nextLine();
 
@@ -143,11 +145,19 @@ public class assignmentOne {
 
 
 									//ask player what attack they wanna use: basic, special etc
-									System.out.println("Use Basic Attack, Special Attack"); // TODO make this into ASCII later
+									System.out.println("Choose attack type!");
+
+									for (int i = 0; i < available_attacks.length; i++){
+										System.out.print(String.format("%d.%s ", (i+1), available_attacks[i]));
+
+									}
+
+									//System.out.println("1.Basic Attack, 2.Special Attack"); // TODO make this into ASCII later
+									//TODO make it so special attack can be used per 1-3 basic attacks
 									int attack_choice = 0;
 
 									try{
-										attack_choice = scanner.nextInt(); //TODO if they input anything thats not the attacks, give them an error and dont let bot attack
+										attack_choice = scanner.nextInt(); 
 									}
 									catch(InputMismatchException e){
 										System.out.println("\nPlease use numbers for the attack choice.");
@@ -156,36 +166,42 @@ public class assignmentOne {
 									}
 									scanner.nextLine();
 
-									switch(attack_choice){ //player attacks
-										case 1 ->{
-											basicAttack(player_figther, bot_figther);
-											break;
-										}
+									if(attack_choice >0 && attack_choice <=2){ //TODO adjust attack_choice range once we got all the attack types
+										switch(attack_choice){ //player attacks
+											case 1 ->{
+												basicAttack(player_figther, bot_figther);
+												break;
+											}
 
-										case 2 ->{
-											specialAttack(player_figther, bot_figther);
-											break;
-										}
+											case 2 ->{
+												specialAttack(player_figther, bot_figther);
+												break;
+											}
 										
-									}
-
-									int random_attack = new Random().nextInt(1,3); // num range 1-2. consider moving it to main while loop
-
-									switch (random_attack) { //bot attacks
-										case 1 ->{
-											basicAttack(bot_figther, player_figther);
-											System.out.println("Bot chose to use basic attack!\n");
-											break;
 										}
 
-										case 2 -> {
-											specialAttack(bot_figther, player_figther);
-											System.out.println(String.format("Bot chose to use %s's special attack!\n",bot_figther.getChampion()));
-											break;
+										int random_attack = new Random().nextInt(1,3); // num range 1-2. consider moving it to main while loop
+
+										switch (random_attack) { //bot attacks
+											// TODO we can get rid of cases due to the available_attacks array :D
+											case 1 ->{
+												basicAttack(bot_figther, player_figther);
+												System.out.println("Bot chose to use basic attack!\n");
+												break;
+											}
+
+											case 2 -> {
+												specialAttack(bot_figther, player_figther);
+												System.out.println(String.format("Bot chose to use %s's special attack!\n",bot_figther.getChampion()));
+												break;
+											}
 										}
-									}
 									
-
+									}
+									else{
+										System.out.println("Please choose a viable attack!");
+										continue;
+									}
 									//print out updated player and bot stats
 									System.out.println(String.format("Player Stats: Hp: %s, Atk: %s, Def: %s", player_figther.getHp(), player_figther.getAtk(), player_figther.getDef()));
 									System.out.println(String.format("Bot Stats: Hp: %s, Atk: %s, Def: %s\n", bot_figther.getHp(), bot_figther.getAtk(), bot_figther.getDef()));
