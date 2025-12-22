@@ -157,7 +157,7 @@ public class assignmentOne {
 									int attack_choice = 0;
 
 									try{
-										attack_choice = scanner.nextInt(); 
+										attack_choice = scanner.nextInt() ; 
 									}
 									catch(InputMismatchException e){
 										System.out.println("\nPlease use numbers for the attack choice.");
@@ -166,7 +166,7 @@ public class assignmentOne {
 									}
 									scanner.nextLine();
 
-									if(attack_choice >0 && attack_choice <=2){ //TODO adjust attack_choice range once we got all the attack types
+									if(attack_choice > 0 && attack_choice <=2){ //TODO adjust attack_choice range once we got all the attack types
 										switch(attack_choice){ //player attacks
 											case 1 ->{
 												basicAttack(player_figther, bot_figther);
@@ -180,9 +180,14 @@ public class assignmentOne {
 										
 										}
 
-										int random_attack = new Random().nextInt(1,3); // num range 1-2. consider moving it to main while loop
+										int random_attack = new Random().nextInt(0,2); //TODO adjust range once all attacks have been added. num range 0-1. consider moving it to main while loop
 
-										switch (random_attack) { //bot attacks
+										basicAttack(bot_figther, player_figther);
+										System.out.println(String.format("Bot chose to use %s!\n", available_attacks[random_attack]));
+										
+										
+										
+										/*switch (random_attack) { //bot attacks
 											// TODO we can get rid of cases due to the available_attacks array :D
 											case 1 ->{
 												basicAttack(bot_figther, player_figther);
@@ -195,7 +200,7 @@ public class assignmentOne {
 												System.out.println(String.format("Bot chose to use %s's special attack!\n",bot_figther.getChampion()));
 												break;
 											}
-										}
+										}*/
 									
 									}
 									else{
