@@ -184,24 +184,6 @@ public class assignmentOne {
 
 										basicAttack(bot_figther, player_figther);
 										System.out.println(String.format("Bot chose to use %s!\n", available_attacks[random_attack]));
-										
-										
-										
-										/*switch (random_attack) { //bot attacks
-											// TODO we can get rid of cases due to the available_attacks array :D
-											case 1 ->{
-												basicAttack(bot_figther, player_figther);
-												System.out.println("Bot chose to use basic attack!\n");
-												break;
-											}
-
-											case 2 -> {
-												specialAttack(bot_figther, player_figther);
-												System.out.println(String.format("Bot chose to use %s's special attack!\n",bot_figther.getChampion()));
-												break;
-											}
-										}*/
-									
 									}
 									else{
 										System.out.println("Please choose a viable attack!");
