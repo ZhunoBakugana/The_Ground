@@ -58,8 +58,6 @@ public class assignmentOne {
 
 		// continue
 	}
-	// TODO maybe somehow make a method for try_catch, cuz we have alot of them here
-	// so far
 
 	// static int random_fighter = new Random().nextInt(1,5);
 
@@ -70,9 +68,135 @@ public class assignmentOne {
 	final static boolean COUNT_METER = true;
 	final static boolean NO_METER = false;
 
+	public static boolean combatLogic(String[] fighter_options, int fighter_choice, int random_fighter) {
+		/*try {
+			System.out.println(String.format("Player fighter: %s \nBot fighter: %s", fighter_options[fighter_choice],
+					fighter_options[random_fighter]));
+		} catch (ArrayIndexOutOfBoundsException e) {
+			System.out.println("Choice out of range!");
+			//continue;
+			return;
+		}*/
+		int turn = 1;
+		boolean player_won = false;
+		Fighter player_figther = new Fighter(100, 10, 5, fighter_options[fighter_choice]);
+		Fighter bot_figther = new Fighter(100, 10, 5, fighter_options[random_fighter]);
+		do {
+			System.out.println(String.format("\nTurn %s", (turn)));
+			// ask player what attack they wanna use: basic, special etc
+			System.out.println("Choose attack type!");
+			for (int i = 0; i < available_attacks.length; i++) {
+				System.out.print(String.format("%d.%s ", (i + 1), available_attacks[i]));
+			}
+			// System.out.println("1.Basic Attack, 2.Special Attack"); // TODO make this into ASCII later
+			int attack_choice;
+			try {
+				attack_choice = scanner.nextInt();
+			} catch (InputMismatchException e) {
+				System.out.println("\nPlease use numbers for the attack choice!");
+				scanner.nextLine();
+				continue;
+			}
+			scanner.nextLine();
+			/*
+			 * if attack choice = 2 while basic attack meters inst 3, give user error
+			 * message telling them to basic attack
+			 */
+			if (attack_choice > 0 && attack_choice <= 2) { // TODO adjust attack_choice range once
+															// we
+															// got all the attack types
+				switch (attack_choice) { // player attacks
+					case 1 -> {
+						basicAttack(player_figther, bot_figther, COUNT_METER);
+						// player_figther.setBasicAttackCount(player_figther.getBasicAttacksCount()
+						// +
+						// 1);
+						System.out.println(
+								"basic attack count is: " + player_figther.getBasicAttacksCount()); // remove
+																									// after
+																									// testing
+																									// is
+																									// complete
+						break;
+					}
+					case 2 -> {
+						if (player_figther.getBasicAttacksCount() < basic_attacks_needed) {
+							System.out
+									.println(String.format("\nPlease use %s more basic attacks!\n",
+											(basic_attacks_needed
+													- player_figther.getBasicAttacksCount())));
+							continue;
+						} else {
+							specialAttack(player_figther, bot_figther);
+							player_figther.setBasicAttackCount(
+									player_figther.getBasicAttacksCount() - basic_attacks_needed); // special
+																									// attacks
+																									// consume
+																									// the
+																									// basic-attack
+																									// meter
+							// System.out.println("basic attack count value after special attack is:
+							// " +
+							// player_figther.getBasicAttacksCount());
+						}
+						break;
+					}
+				}
+				int random_attack = new Random().nextInt(1, 3); // TODO adjust range once all
+																// attacks
+																// have been added. num range 1-2.
+																// consider moving it to main while
+																// loop
+				switch (random_attack) {
+					case 1 -> {
+						basicAttack(bot_figther, player_figther, COUNT_METER);
+						break;
+					}
+					case 2 -> {
+						if (bot_figther.getBasicAttacksCount() != basic_attacks_needed) {
+							basicAttack(bot_figther, player_figther, COUNT_METER);
+						} else {
+							specialAttack(bot_figther, player_figther);
+							bot_figther.setBasicAttackCount(
+									bot_figther.getBasicAttacksCount() - basic_attacks_needed); // special
+																								// attacks
+																								// consume
+																								// the
+																								// basic-attack
+																								// meter
+						}
+						break;
+					}
+				}
+				System.out.println(
+						String.format("Bot chose to use %s!\n",
+								available_attacks[random_attack - 1]));
+			} else {
+				System.out.println("Please choose a viable attack!");
+				continue;
+			}
+			// increase turn count by 1
+			turn++;
+			// print out updated player and bot stats
+			System.out.println(String.format("Player Stats: Hp: %s, Atk: %s, Def: %s",
+					player_figther.getHp(), player_figther.getAtk(), player_figther.getDef()));
+			System.out.println(String.format("Bot Stats: Hp: %s, Atk: %s, Def: %s\n",
+					bot_figther.getHp(), bot_figther.getAtk(), bot_figther.getDef()));
+			
+			if(player_figther.getHp() == 0){
+				player_won = false; //idk maybe edit this or player_won initialization
+			}
+			else if (bot_figther.getHp() == 0){
+				player_won = true;
+			}
+				
+		} while (player_figther.getHp() > 0 && bot_figther.getHp() > 0); // keep going until either player or bot wins
+		return player_won;
+	}
+	static Scanner scanner = new Scanner(System.in);
 	public static void main(String[] args) {
 
-		Scanner scanner = new Scanner(System.in);
+		
 
 		String[] fighter_options = { "Aatrox", "Kayn", "Kayle", "Pantheon" }; // TODO ASCII art of champions + their
 																				// names in borders
@@ -100,7 +224,9 @@ public class assignmentOne {
 			int menu_choice;
 
 			try {
-				menu_choice = scanner.nextInt(); //TODO. players are able to enter an out of range number and the program prompts them to enter a choice again, which is fine but maybe consider giving players an error message
+				menu_choice = scanner.nextInt(); // TODO. players are able to enter an out of range number and the
+													// program prompts them to enter a choice again, which is fine but
+													// maybe consider giving players an error message
 			} catch (InputMismatchException e) {
 				System.out.println("Please use numbers for the menu choice!");
 				scanner.nextLine();
@@ -119,7 +245,8 @@ public class assignmentOne {
 					System.out.println("Choose a character(C) or play a random(R) one?");
 
 					String random_choice_or_not = scanner.nextLine().replaceAll("\\s+", "").toUpperCase();
-					while(true){ //in case the user uses a character that's not a number for the character choise, we'll keep asking them to do so
+					while (true) { // in case the user uses a character that's not a number for the character
+									// choise, we'll keep asking them to do so
 						if (random_choice_or_not.equals("C")) {
 							System.out.println("You can choose from: \n");
 							for (int i = 0; i < fighter_options.length; i++) {
@@ -127,174 +254,49 @@ public class assignmentOne {
 							}
 
 							System.out.println("Make your choice! \n");
-							int fighter_choice; 
+							int fighter_choice;
 
 							try {
-								fighter_choice = scanner.nextInt() - 1; // TODO this line could be giving
-																		// IndexOutOfBoundException, please have a look
-								System.out.println("This is the value of fighter choice: " + fighter_choice + "\n");
+								fighter_choice = scanner.nextInt() - 1; //TODO still causing ArrayIndexOutOfBoundsException
+								System.out.println(String.format("This is the value of fighter choice: %s", fighter_choice));
 							} catch (InputMismatchException e) {
 								System.out.println("\nPlease use numbers for the fighter choice!");
 								scanner.nextLine();
 								continue;
-								// TODO maybe make the player go back to the start of this case instead of menu
 							}
-							scanner.nextLine();
+							//scanner.nextLine();
 
-							try{
-								System.out.println(String.format("Player fighter: %s \nBot fighter: %s",fighter_options[fighter_choice], fighter_options[random_fighter])); //TODO give player an error message if their choice is out of range
-							}
-							catch (ArrayIndexOutOfBoundsException e){
+							try {
+								System.out.println(String.format("Player fighter: %s \nBot fighter: %s",
+										fighter_options[fighter_choice], fighter_options[random_fighter]));
+							} catch (ArrayIndexOutOfBoundsException e) {
 								System.out.println("Choice out of range!");
+								scanner.nextLine();
 								continue;
 							}
-							int turn = 1;
-
-							Fighter player_figther = new Fighter(100, 10, 5, fighter_options[fighter_choice]);
-
-							Fighter bot_figther = new Fighter(100, 10, 5, fighter_options[random_fighter]);
-
-							do {
-								System.out.println(String.format("\nTurn %s", (turn))); // TODO the counter shouldn't go
-																						// up
-																						// in case of a triggered
-																						// check/error that doesn't
-																						// allow
-																						// the player or bot to attack
-
-								// ask player what attack they wanna use: basic, special etc
-								System.out.println("Choose attack type!");
-
-								for (int i = 0; i < available_attacks.length; i++) {
-									System.out.print(String.format("%d.%s ", (i + 1), available_attacks[i]));
-
-								}
-
-								// System.out.println("1.Basic Attack, 2.Special Attack"); // TODO make this into ASCII later
-
-								int attack_choice;
-
-								try {
-									attack_choice = scanner.nextInt();
-								} catch (InputMismatchException e) {
-									System.out.println("\nPlease use numbers for the attack choice!");
-									scanner.nextLine();
-									continue;
-								}
-								scanner.nextLine();
-
-								/*
-								 * if attack choice = 2 while basic attack meters inst 3, give user error
-								 * message telling them to basic attack
-								 */
-
-								if (attack_choice > 0 && attack_choice <= 2) { // TODO adjust attack_choice range once
-																				// we
-																				// got all the attack types
-									switch (attack_choice) { // player attacks
-										case 1 -> {
-											basicAttack(player_figther, bot_figther, COUNT_METER);
-											// player_figther.setBasicAttackCount(player_figther.getBasicAttacksCount()
-											// +
-											// 1);
-											System.out.println(
-													"basic attack count is: " + player_figther.getBasicAttacksCount()); // remove
-																														// after
-																														// testing
-																														// is
-																														// complete
-											break;
-										}
-
-										case 2 -> {
-											if (player_figther.getBasicAttacksCount() < basic_attacks_needed) {
-												System.out
-														.println(String.format("\nPlease use %s more basic attacks!\n",
-																(basic_attacks_needed
-																		- player_figther.getBasicAttacksCount())));
-												continue;
-											} else {
-												specialAttack(player_figther, bot_figther);
-												player_figther.setBasicAttackCount(
-														player_figther.getBasicAttacksCount() - basic_attacks_needed); // special
-																														// attacks
-																														// consume
-																														// the
-																														// basic-attack
-																														// meter
-
-												// System.out.println("basic attack count value after special attack is:
-												// " +
-												// player_figther.getBasicAttacksCount());
-											}
-
-											break;
-										}
-
-									}
-
-									int random_attack = new Random().nextInt(1, 3); // TODO adjust range once all
-																					// attacks
-																					// have been added. num range 1-2.
-																					// consider moving it to main while
-																					// loop
-									switch (random_attack) {
-										case 1 -> {
-											basicAttack(bot_figther, player_figther, COUNT_METER);
-											break;
-
-										}
-										case 2 -> {
-											if (bot_figther.getBasicAttacksCount() != basic_attacks_needed) {
-												basicAttack(bot_figther, player_figther, COUNT_METER);
-											} else {
-												specialAttack(bot_figther, player_figther);
-												bot_figther.setBasicAttackCount(
-														bot_figther.getBasicAttacksCount() - basic_attacks_needed); // special
-																													// attacks
-																													// consume
-																													// the
-																													// basic-attack
-																													// meter
-
-											}
-											break;
-
-										}
-									}
-									System.out.println(
-											String.format("Bot chose to use %s!\n",
-													available_attacks[random_attack - 1]));
-								} else {
-									System.out.println("Please choose a viable attack!");
-									continue;
-								}
-								// increase turn count by 1
-								turn++;
-
-								// print out updated player and bot stats
-								System.out.println(String.format("Player Stats: Hp: %s, Atk: %s, Def: %s",
-										player_figther.getHp(), player_figther.getAtk(), player_figther.getDef()));
-								System.out.println(String.format("Bot Stats: Hp: %s, Atk: %s, Def: %s\n",
-										bot_figther.getHp(), bot_figther.getAtk(), bot_figther.getDef()));
-
-								// break; // remove after combat logic is implemented
-							} while (player_figther.getHp() > 0 && bot_figther.getHp() > 0); // keep going until either
-																								// player or bot wins
+							scanner.nextLine();
+							
+							if(combatLogic(fighter_options,fighter_choice,random_fighter)){
+								System.out.println("Player won!");
+							}
+							else{
+								System.out.println("Bot won!");
+							}
+							//TODO after player wins ask them if they wanna continue or quit
+							break;
 
 						} else if (random_choice_or_not.equals("R")) {
-							// System.out.println(character_choice);
+							//TODO write logic
 							System.out.println(fighter_options[random_fighter]);
-							//maybe add a break;
+							// maybe add a break;
 						}
 
 						else {
-							//prints out error message and restarts the main loop
-							System.out.println("Please enter either C or R!\n"); 
-							break; 
+							// prints out error message and restarts the main loop
+							System.out.println("Please enter either C or R!\n");
+							break;
 						}
 					}
-					//TODO add winning condition and message. after player wins ask them if they wanna continue or quit
 				}
 
 				case 3 -> {
