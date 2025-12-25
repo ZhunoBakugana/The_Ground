@@ -208,7 +208,7 @@ public class assignmentOne {
 											case 1 -> {
 												basicAttack(bot_figther, player_figther, COUNT_METER);
 												break;
-
+												
 
 											}
 											case 2 -> {
