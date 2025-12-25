@@ -69,14 +69,6 @@ public class assignmentOne {
 	final static boolean NO_METER = false;
 
 	public static boolean combatLogic(String[] fighter_options, int fighter_choice, int random_fighter) {
-		/*try {
-			System.out.println(String.format("Player fighter: %s \nBot fighter: %s", fighter_options[fighter_choice],
-					fighter_options[random_fighter]));
-		} catch (ArrayIndexOutOfBoundsException e) {
-			System.out.println("Choice out of range!");
-			//continue;
-			return;
-		}*/
 		int turn = 1;
 		boolean player_won = false;
 		Fighter player_figther = new Fighter(100, 10, 5, fighter_options[fighter_choice]);
@@ -98,19 +90,12 @@ public class assignmentOne {
 				continue;
 			}
 			scanner.nextLine();
-			/*
-			 * if attack choice = 2 while basic attack meters inst 3, give user error
-			 * message telling them to basic attack
-			 */
 			if (attack_choice > 0 && attack_choice <= 2) { // TODO adjust attack_choice range once
 															// we
 															// got all the attack types
 				switch (attack_choice) { // player attacks
 					case 1 -> {
 						basicAttack(player_figther, bot_figther, COUNT_METER);
-						// player_figther.setBasicAttackCount(player_figther.getBasicAttacksCount()
-						// +
-						// 1);
 						System.out.println(
 								"basic attack count is: " + player_figther.getBasicAttacksCount()); // remove
 																									// after
