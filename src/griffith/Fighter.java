@@ -1,6 +1,7 @@
 package griffith;
 
 public class Fighter {
+    //TODO make some private variables in Fighter to keep track of player player statistics
     private int hp;
     private int atk;
     private int def;

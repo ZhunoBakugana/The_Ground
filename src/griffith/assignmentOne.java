@@ -10,6 +10,13 @@ import java.util.Random;
 
 public class assignmentOne {
 
+	// static int random_fighter = new Random().nextInt(1,5);
+	static Scanner scanner = new Scanner(System.in);
+	static String[] available_attacks = { "Basic attack", "Special attack" };
+	static int basic_attacks_needed = 3;
+	final static boolean COUNT_METER = true;
+	final static boolean NO_METER = false;
+
 	// maybe let the computer to play the same character as the player and in that
 	// case just delete this
 	public static String[] removeChosenCharacter(String[] array, int remove_index) {
@@ -58,15 +65,6 @@ public class assignmentOne {
 
 		// continue
 	}
-
-	// static int random_fighter = new Random().nextInt(1,5);
-
-	static String[] available_attacks = { "Basic attack", "Special attack" };
-
-	static int basic_attacks_needed = 3;
-
-	final static boolean COUNT_METER = true;
-	final static boolean NO_METER = false;
 
 	public static boolean combatLogic(String[] fighter_options, int fighter_choice, int random_fighter) {
 		int turn = 1;
@@ -189,14 +187,11 @@ public class assignmentOne {
 
 		return rerun;
 	}
-
-	static Scanner scanner = new Scanner(System.in);
-
+	
 	public static void main(String[] args) {
 
 		String[] fighter_options = { "Aatrox", "Kayn", "Kayle", "Pantheon" }; // TODO ASCII art of champions + their
 																				// names in borders
-
 		while (true) {
 
 			int random_fighter = new Random().nextInt(1, 4); // num range: 1-3
@@ -244,11 +239,6 @@ public class assignmentOne {
 					while (true) { // in case the user uses a character that's not a number for the character
 									// choise, we'll keep asking them to do so
 						if (random_choice_or_not.equals("C")) {
-
-							// String fight_on = "";
-							// System.out.println("rerun value before do while loop: " + rerun);
-
-							// do {
 							System.out.println("You can choose from: \n");
 							for (int i = 0; i < fighter_options.length; i++) {
 								System.out.println((i + 1) + "." + fighter_options[i]);
@@ -266,7 +256,6 @@ public class assignmentOne {
 								scanner.nextLine();
 								continue;
 							}
-							// scanner.nextLine();
 
 							try {
 								System.out.println(String.format("Player fighter: %s \nBot fighter: %s",
@@ -278,50 +267,21 @@ public class assignmentOne {
 							}
 							scanner.nextLine();
 
-							// boolean testing = combatLogic(fighter_options,fighter_choice,random_fighter);
-
 							if (combatLogic(fighter_options, fighter_choice, random_fighter)) { 
 								System.out.println("Player won!");
-								// System.out.println(String.format("Combat logic method output is: %s",
-								// testing));
 							} else {
 								System.out.println("Bot won!");
-								// System.out.println("Combat logic method output is: " +
-								// combatLogic(fighter_options,fighter_choice,random_fighter));
 							}
 
 							String fight_on;
-							System.out.print(
-									"\nWould you like to continue fighting(r) or click any other key to go back to menu? ");
+							System.out.print("\nWould you like to continue fighting(r) or click any other key to go back to menu? ");
 							fight_on = scanner.nextLine().replaceAll("\\s+", "").toLowerCase();
-							// continue_fight(fight_on);
-							// scanner.nextLine();
-							// break;
-							// System.out.println("fight on value after scanner: "+fight_on);
 
 							if (continue_fight(fight_on)) {
 								continue;
 							} else {
 								break;
 							}
-
-							/*
-							 * try{
-							 * fight_on = scanner.nextLine().replaceAll("\\s+", "").toLowerCase();
-							 * }
-							 * catch(InputMismatchException e){
-							 * System.out.println("Please use either c or m!");
-							 * //scanner.nextLine();
-							 * }
-							 * scanner.nextLine();
-							 * continue;
-							 */
-
-							// continue for fighter choice menu and break; for main menu
-
-							// TODO after player wins ask them if they wanna continue or quit
-
-							// } while (rerun == true);
 						}
 
 						else if (random_choice_or_not.equals("R")) {
