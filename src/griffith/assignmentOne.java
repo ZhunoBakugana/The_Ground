@@ -188,7 +188,8 @@ public class assignmentOne {
 
 		while (true) {
 
-			int random_fighter = new Random().nextInt(1, 5); // num range: 1-4.
+			int random_fighter = new Random().nextInt(1, 4); // num range: 1-3
+			System.out.println("Random fighter value is: " + random_fighter);
 
 			/*
 			 * File myObj = new File("src/files/menu.txt");
