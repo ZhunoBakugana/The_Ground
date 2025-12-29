@@ -66,6 +66,8 @@ public class assignmentOne {
 		// continue
 	}
 
+	//TODO was gonna write some comment about creating a method but forgot what the method was gonna be about
+
 	public static boolean combatLogic(String[] fighter_options, int fighter_choice, int random_fighter) {
 		int turn = 1;
 		boolean player_won = false;
@@ -266,6 +268,7 @@ public class assignmentOne {
 								continue;
 							}
 							scanner.nextLine();
+							// TODO after combat message + "fight again" logic should be a method since both game modes will need it
 
 							if (combatLogic(fighter_options, fighter_choice, random_fighter)) { 
 								System.out.println("Player won!");
