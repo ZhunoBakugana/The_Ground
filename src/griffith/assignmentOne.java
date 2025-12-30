@@ -17,6 +17,8 @@ public class assignmentOne {
 	final static boolean COUNT_METER = true;
 	final static boolean NO_METER = false;
 
+	static String[] fighter_options = { "Aatrox", "Kayn", "Kayle", "Pantheon" };
+
 	// maybe let the computer to play the same character as the player and in that
 	// case just delete this
 	public static String[] removeChosenCharacter(String[] array, int remove_index) {
@@ -54,8 +56,7 @@ public class assignmentOne {
 			defender.setHp(defender.getHp() - (attacker.getAtk() / (defender.getDef() / 2)));
 
 		} else if (attacker.getChampion().equals("Kayn")) {
-			defender.setDef(defender.getDef() - 1); // maybe modify how much defence they lose later on. TODO also fix
-													// ArithmeticException :3
+			defender.setDef(defender.getDef() - 1); // maybe modify how much defence they lose later on. TODO also fix ArithmeticException :3
 			basicAttack(attacker, defender, NO_METER);
 
 		} else if (attacker.getChampion().equals("Pantheon")) {
@@ -68,11 +69,11 @@ public class assignmentOne {
 
 	//TODO was gonna write some comment about creating a method but forgot what the method was gonna be about
 
-	public static boolean combatLogic(String[] fighter_options, int fighter_choice, int random_fighter) {
+	public static boolean combatLogic(String[] fighter_options, int fighter_choice, int random_bot) {
 		int turn = 1;
 		boolean player_won = false;
 		Fighter player_figther = new Fighter(100, 500, 5, fighter_options[fighter_choice]);
-		Fighter bot_figther = new Fighter(100, 10, 5, fighter_options[random_fighter]);
+		Fighter bot_figther = new Fighter(100, 10, 5, fighter_options[random_bot]);
 		do {
 			System.out.println(String.format("\nTurn %s", (turn)));
 			// ask player what attack they wanna use: basic, special etc
@@ -189,15 +190,29 @@ public class assignmentOne {
 
 		return rerun;
 	}
+
+	/*String fight_on = scanner.nextLine().replaceAll("\\s+", "").toLowerCase();
+	if (continue_fight(fight_on)) {
+		continue;
+	} else {
+		break;
+	}*/
 	
+	/*int random_bot = new Random().nextInt(fighter_options.length); // num range: however many champs we have
+	int random_player_fighter = new Random().nextInt(fighter_options.length); // num range: 1-3*/
+	
+	public static int randomFighter(){ // making random_fighter into static wouldn't be able to change each time, the player wishes to re-fight in random mode, hence why this method exists
+		int random_fighter = new Random().nextInt(fighter_options.length); // num range: 1-3
+		return random_fighter;
+	}
 	public static void main(String[] args) {
 
-		String[] fighter_options = { "Aatrox", "Kayn", "Kayle", "Pantheon" }; // TODO ASCII art of champions + their
+		 // TODO ASCII art of champions + their
 																				// names in borders
 		while (true) {
 
-			int random_fighter = new Random().nextInt(1, 4); // num range: 1-3
-
+			
+			
 			/*
 			 * File myObj = new File("src/files/menu.txt");
 			 * 
@@ -261,24 +276,25 @@ public class assignmentOne {
 
 							try {
 								System.out.println(String.format("Player fighter: %s \nBot fighter: %s",
-										fighter_options[fighter_choice], fighter_options[random_fighter]));
+										fighter_options[fighter_choice], fighter_options[randomFighter()])); 
 							} catch (ArrayIndexOutOfBoundsException e) {
 								System.out.println("Choice out of range!");
 								scanner.nextLine();
 								continue;
 							}
 							scanner.nextLine();
-							// TODO after combat message + "fight again" logic should be a method since both game modes will need it
+							
 
-							if (combatLogic(fighter_options, fighter_choice, random_fighter)) { 
+							if (combatLogic(fighter_options, fighter_choice, randomFighter())) { 
 								System.out.println("Player won!");
 							} else {
 								System.out.println("Bot won!");
 							}
 
-							String fight_on;
+							// TODO after combat message + "fight again" logic should be a method since both game modes will need it
+							//String fight_on;
 							System.out.print("\nWould you like to continue fighting(r) or click any other key to go back to menu? ");
-							fight_on = scanner.nextLine().replaceAll("\\s+", "").toLowerCase();
+							String fight_on = scanner.nextLine().replaceAll("\\s+", "").toLowerCase();
 
 							if (continue_fight(fight_on)) {
 								continue;
@@ -288,9 +304,28 @@ public class assignmentOne {
 						}
 
 						else if (random_choice_or_not.equals("R")) {
-							// TODO write logic
-							System.out.println(fighter_options[random_fighter]);
-							// maybe add a break;
+							
+							System.out.println(String.format("Player fighter is: %s",fighter_options[randomFighter()]));
+							System.out.println(String.format("Bot fighter is: %s",fighter_options[randomFighter()]));
+
+							if (combatLogic(fighter_options, randomFighter(), randomFighter())) { 
+								System.out.println("Player won!");
+							} else {
+								System.out.println("Bot won!");
+							}				
+							//String fight_on;
+							System.out.print("\nWould you like to continue fighting(r) or click any other key to go back to menu? ");
+							String fight_on = scanner.nextLine().replaceAll("\\s+", "").toLowerCase();
+							
+
+							if (continue_fight(fight_on)) {
+								continue;
+							} else {
+								break;
+							}		
+
+							//System.out.println(fighter_options[random_fighter]);
+							//break;
 						}
 
 						else {
