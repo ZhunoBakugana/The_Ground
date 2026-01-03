@@ -190,8 +190,8 @@ public class assignmentOne {
 
 		return rerun;
 	}
-
-	/*String fight_on = scanner.nextLine().replaceAll("\\s+", "").toLowerCase();
+	/*System.out.print("\nWould you like to continue fighting(r) or click any other key to go back to menu? ");
+	String fight_on = scanner.nextLine().replaceAll("\\s+", "").toLowerCase(); //if we make fight_on static maybe we could include the print into a method
 	if (continue_fight(fight_on)) {
 		continue;
 	} else {
@@ -294,7 +294,7 @@ public class assignmentOne {
 							// TODO after combat message + "fight again" logic should be a method since both game modes will need it
 							//String fight_on;
 							System.out.print("\nWould you like to continue fighting(r) or click any other key to go back to menu? ");
-							String fight_on = scanner.nextLine().replaceAll("\\s+", "").toLowerCase();
+							String fight_on = scanner.nextLine().replaceAll("\\s+", "").toLowerCase(); 
 
 							if (continue_fight(fight_on)) {
 								continue;
