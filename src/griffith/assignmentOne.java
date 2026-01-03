@@ -1,8 +1,15 @@
 package griffith;
 
+import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.util.Scanner;
 import java.util.InputMismatchException;
@@ -14,10 +21,17 @@ public class assignmentOne {
 	static Scanner scanner = new Scanner(System.in);
 	static String[] available_attacks = { "Basic attack", "Special attack" };
 	static int basic_attacks_needed = 3;
+
 	final static boolean COUNT_METER = true;
 	final static boolean NO_METER = false;
 
+	final static boolean PLAYER = true;
+	final static boolean NON_PLAYER = false;
+
 	static String[] fighter_options = { "Aatrox", "Kayn", "Kayle", "Pantheon" };
+
+	static File file = new File("src/files/player_statistics.txt");
+	
 
 	// maybe let the computer to play the same character as the player and in that
 	// case just delete this
@@ -41,27 +55,41 @@ public class assignmentOne {
 		return updated_fighter_list;
 	}
 
-	public static void basicAttack(Fighter attacker, Fighter defender, boolean count) {
-		defender.setHp(defender.getHp() - (attacker.getAtk() / defender.getDef()));
+	public static void basicAttack(Fighter attacker, Fighter defender, boolean count, boolean player) {
+		int dmg_done =  (attacker.getAtk() / defender.getDef());
+		defender.setHp(defender.getHp() - dmg_done);
+		//Fighter.setBasicAttackDamageDone(dmg_done);
 		if (count) {
 			attacker.setBasicAttackCount(attacker.getBasicAttacksCount() + 1);
 		}
+		if(player){
+			attacker.setBasicAttackDamageDone(attacker.getBasicAttackDamageDone() + dmg_done);
+		}
 	}
 
-	public static void specialAttack(Fighter attacker, Fighter defender) {
-		if (attacker.getChampion().equals("Aatrox")) { // ask prof if we can use enums
-			defender.setHp(defender.getHp() - (attacker.getAtk() / defender.getDef()) * 2);
+	public static void specialAttack(Fighter attacker, Fighter defender, boolean player) { //TODO make the bot always use special attack when it's up
+	int dmg_done = 0;
+		if (attacker.getChampion().equals("Aatrox")) { 
+			dmg_done = (attacker.getAtk() / defender.getDef()) * 2;
+			defender.setHp(defender.getHp() - dmg_done );
 			attacker.setHp(attacker.getHp() + 15);
 		} else if (attacker.getChampion().equals("Kayle")) {
-			defender.setHp(defender.getHp() - (attacker.getAtk() / (defender.getDef() / 2)));
+			dmg_done = (attacker.getAtk() / (defender.getDef() / 2));
+			defender.setHp(defender.getHp() - dmg_done);
 
+		//Patheon and Kayn just affect enemy stats and then basic attack. Which is why they're not contributing to the specialAttackDamage Counter
 		} else if (attacker.getChampion().equals("Kayn")) {
 			defender.setDef(defender.getDef() - 1); // maybe modify how much defence they lose later on. TODO also fix ArithmeticException :3
-			basicAttack(attacker, defender, NO_METER);
+			basicAttack(attacker, defender, NO_METER, NON_PLAYER); 
 
 		} else if (attacker.getChampion().equals("Pantheon")) {
 			attacker.setAtk(attacker.getAtk() + 5); // maybe modify how much attack they gain later on
-			basicAttack(attacker, defender, NO_METER);
+			basicAttack(attacker, defender, NO_METER, NON_PLAYER);
+		}
+		//TODO think about NON_PLAYER here
+
+		if(player){
+			attacker.setSpecialAttackDamageDone(attacker.getSpecialAttackDamageDone() + dmg_done);
 		}
 
 		// continue
@@ -72,7 +100,7 @@ public class assignmentOne {
 	public static boolean combatLogic(String[] fighter_options, int fighter_choice, int random_bot) {
 		int turn = 1;
 		boolean player_won = false;
-		Fighter player_figther = new Fighter(100, 500, 5, fighter_options[fighter_choice]);
+		Fighter player_figther = new Fighter(100, 10, 5, fighter_options[fighter_choice]);
 		Fighter bot_figther = new Fighter(100, 10, 5, fighter_options[random_bot]);
 		do {
 			System.out.println(String.format("\nTurn %s", (turn)));
@@ -95,9 +123,9 @@ public class assignmentOne {
 			if (attack_choice > 0 && attack_choice <= 2) { // TODO adjust attack_choice range once
 															// we
 															// got all the attack types
-				switch (attack_choice) { // player attacks
+				switch (attack_choice) { // TODO maybe add an option to quit game
 					case 1 -> {
-						basicAttack(player_figther, bot_figther, COUNT_METER);
+						basicAttack(player_figther, bot_figther, COUNT_METER, PLAYER);
 						System.out.println(
 								"basic attack count is: " + player_figther.getBasicAttacksCount()); // remove
 																									// after
@@ -114,7 +142,7 @@ public class assignmentOne {
 													- player_figther.getBasicAttacksCount())));
 							continue;
 						} else {
-							specialAttack(player_figther, bot_figther);
+							specialAttack(player_figther, bot_figther, PLAYER);
 							player_figther.setBasicAttackCount(
 									player_figther.getBasicAttacksCount() - basic_attacks_needed); // special
 																									// attacks
@@ -136,14 +164,14 @@ public class assignmentOne {
 																// loop
 				switch (random_attack) {
 					case 1 -> {
-						basicAttack(bot_figther, player_figther, COUNT_METER);
+						basicAttack(bot_figther, player_figther, COUNT_METER, NON_PLAYER);
 						break;
 					}
 					case 2 -> {
 						if (bot_figther.getBasicAttacksCount() != basic_attacks_needed) {
-							basicAttack(bot_figther, player_figther, COUNT_METER);
+							basicAttack(bot_figther, player_figther, COUNT_METER, NON_PLAYER);
 						} else {
-							specialAttack(bot_figther, player_figther);
+							specialAttack(bot_figther, player_figther, NON_PLAYER);
 							bot_figther.setBasicAttackCount(
 									bot_figther.getBasicAttacksCount() - basic_attacks_needed); // special
 																								// attacks
@@ -162,6 +190,10 @@ public class assignmentOne {
 				System.out.println("Please choose a viable attack!");
 				continue;
 			}
+
+			//write player statistics before next turn
+			playerStatistics(player_figther, bot_figther);
+
 			// increase turn count by 1
 			turn++;
 			// print out updated player and bot stats
@@ -204,6 +236,50 @@ public class assignmentOne {
 	public static int randomFighter(){ // making random_fighter into static wouldn't be able to change each time, the player wishes to re-fight in random mode, hence why this method exists
 		int random_fighter = new Random().nextInt(fighter_options.length); // num range: 1-3
 		return random_fighter;
+	}
+
+	public static void playerStatistics(Fighter attacker, Fighter defender){
+		//maybe have a *Total*, *Story Mode*, and *Free Play* statistics
+
+		/*try {
+			FileWriter statistics_writer = new FileWriter(file);
+			statistics_writer.write("Basic attack damage done: " + attacker.getBasicAttackDamageDone());
+			statistics_writer.close();
+			System.out.println("Successfully wrote to the file.");
+		} catch (IOException e) {
+			System.out.println("An error occured!");
+			e.printStackTrace();
+		}*/
+		 
+		try {
+			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
+			oos.writeObject("Basic attack damage done: " + attacker.getBasicAttackDamageDone());
+			oos.writeObject("\nSpecial attack damage done: " + attacker.getSpecialAttackDamageDone());
+			oos.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		//basic attack dmg done
+
+
+		//special attack dmg done
+		//basic attacks done
+		//special attacks done
+		//total dmg done
+		//hp healed
+		//games played
+		//games won
+		//games lost
+		//times played specific champions
+		//story mode specific bosses beaten
+		//story mode which stages complete
+		//story mode times beaten
+		
 	}
 	public static void main(String[] args) {
 
@@ -342,6 +418,36 @@ public class assignmentOne {
 
 				case 4 -> {
 					// player statistics
+					//maybe transfer code into method
+
+					 
+
+					if(file.isFile()){
+						try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+							
+							while(true){	// keep reading until the end of file is reached
+								try{
+									Object obj = ois.readObject();
+									System.out.println(obj);
+								}
+								catch(EOFException e){
+									
+									break;
+								}
+							}
+							//ois.close();
+						} catch (FileNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (ClassNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+					}
 				}
 
 				case 5 -> {
