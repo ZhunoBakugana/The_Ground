@@ -31,6 +31,8 @@ public class assignmentOne {
 	static String[] fighter_options = { "Aatrox", "Kayn", "Kayle", "Pantheon" };
 
 	static File file = new File("src/files/player_statistics.txt");
+
+	static PlayerStatistics stats = new PlayerStatistics();
 	
 
 	// maybe let the computer to play the same character as the player and in that
@@ -61,6 +63,7 @@ public class assignmentOne {
 		//Fighter.setBasicAttackDamageDone(dmg_done);
 		if (count) {
 			attacker.setBasicAttackCount(attacker.getBasicAttacksCount() + 1);
+			attacker.setBasicAttackCountForStatistics(attacker.getBasicAttacksCountForStatistics() + 1);
 		}
 		if(player){
 			attacker.setBasicAttackDamageDone(attacker.getBasicAttackDamageDone() + dmg_done);
@@ -143,8 +146,7 @@ public class assignmentOne {
 							continue;
 						} else {
 							specialAttack(player_figther, bot_figther, PLAYER);
-							player_figther.setBasicAttackCount(
-									player_figther.getBasicAttacksCount() - basic_attacks_needed); // special
+							player_figther.setBasicAttackCount(player_figther.getBasicAttacksCount() - basic_attacks_needed); // special
 																									// attacks
 																									// consume
 																									// the
@@ -191,9 +193,6 @@ public class assignmentOne {
 				continue;
 			}
 
-			//write player statistics before next turn
-			playerStatistics(player_figther, bot_figther);
-
 			// increase turn count by 1
 			turn++;
 			// print out updated player and bot stats
@@ -209,6 +208,19 @@ public class assignmentOne {
 			}
 
 		} while (player_figther.getHp() > 0 && bot_figther.getHp() > 0); // keep going until either player or bot wins
+		stats.addStats(player_figther, bot_figther); //update combat stats after round
+
+		//update games played/won
+		stats.games_played++;
+		if(player_won){
+			stats.games_won++;
+		}
+		else{
+			stats.games_lost++;
+		}
+
+		saveStats(); //update player statistics 
+
 		return player_won;
 	}
 
@@ -222,15 +234,6 @@ public class assignmentOne {
 
 		return rerun;
 	}
-	/*System.out.print("\nWould you like to continue fighting(r) or click any other key to go back to menu? ");
-	String fight_on = scanner.nextLine().replaceAll("\\s+", "").toLowerCase(); //if we make fight_on static maybe we could include the print into a method
-	if (continue_fight(fight_on)) {
-		continue;
-	} else {
-		break;
-	}*/
-	
-	/*int random_bot = new Random().nextInt(fighter_options.length); // num range: however many champs we have
 	int random_player_fighter = new Random().nextInt(fighter_options.length); // num range: 1-3*/
 	
 	public static int randomFighter(){ // making random_fighter into static wouldn't be able to change each time, the player wishes to re-fight in random mode, hence why this method exists
@@ -238,24 +241,10 @@ public class assignmentOne {
 		return random_fighter;
 	}
 
-	public static void playerStatistics(Fighter attacker, Fighter defender){
-		//maybe have a *Total*, *Story Mode*, and *Free Play* statistics
-
-		/*try {
-			FileWriter statistics_writer = new FileWriter(file);
-			statistics_writer.write("Basic attack damage done: " + attacker.getBasicAttackDamageDone());
-			statistics_writer.close();
-			System.out.println("Successfully wrote to the file.");
-		} catch (IOException e) {
-			System.out.println("An error occured!");
-			e.printStackTrace();
-		}*/
-		 
-		try {
-			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
-			oos.writeObject("Basic attack damage done: " + attacker.getBasicAttackDamageDone());
-			oos.writeObject("\nSpecial attack damage done: " + attacker.getSpecialAttackDamageDone());
-			oos.close();
+	public static void saveStats(){
+		try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+			oos.writeObject(stats);
+			//oos.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -263,25 +252,25 @@ public class assignmentOne {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		//basic attack dmg done
-
-
-		//special attack dmg done
-		//basic attacks done
-		//special attacks done
-		//total dmg done
-		//hp healed
-		//games played
-		//games won
-		//games lost
-		//times played specific champions
-		//story mode specific bosses beaten
-		//story mode which stages complete
-		//story mode times beaten
-		
 	}
+
+	public static void loadStats(){
+		if (!file.exists() || file.length() == 0) { //if a file doesn't exist or if it's empty we create new stats
+			stats = new PlayerStatistics();
+			return;//once new stats are created we immediately exit this method as to not trigger EOFException
+			}
+			try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {//the program tries reading the header immediately from the file, since serialized files start with a header and empty files wouldn't have one, we get a EOFException. hence why we have the above if()
+				stats = (PlayerStatistics) ois.readObject(); //ois.readObject() returns an object and we cast it to PlayerStatistics
+			} 
+			
+			 catch (IOException | ClassNotFoundException e) {
+				stats = new PlayerStatistics();
+				e.printStackTrace();
+			} 
+	}
+
 	public static void main(String[] args) {
+		loadStats(); //load player statistics at game start
 
 		 // TODO ASCII art of champions + their
 																				// names in borders
@@ -419,35 +408,12 @@ public class assignmentOne {
 				case 4 -> {
 					// player statistics
 					//maybe transfer code into method
-
-					 
-
-					if(file.isFile()){
-						try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-							
-							while(true){	// keep reading until the end of file is reached
-								try{
-									Object obj = ois.readObject();
-									System.out.println(obj);
-								}
-								catch(EOFException e){
-									
-									break;
-								}
-							}
-							//ois.close();
-						} catch (FileNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (ClassNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						
-					}
+					System.out.println("Basic damage done: " + stats.basic_attack_dmg_done);
+					System.out.println("Special damage done: " + stats.special_attack_dmg_done);
+					System.out.println("Basic attacks: " + stats.basic_attack_counter);
+					System.out.println("Games played: " + stats.games_played);
+					System.out.println("Games won: " + stats.games_won);
+					System.out.println("Games lost: " + stats.games_lost);
 				}
 
 				case 5 -> {

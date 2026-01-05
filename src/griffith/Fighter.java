@@ -1,13 +1,13 @@
 package griffith;
 
 public class Fighter {
-    //TODO make some private variables in Fighter to keep track of player player statistics
     private int hp;
     private int atk;
     private int def;
     private String champion;
 
-    private int basic_attack_counter;
+    private int basic_attack_counter; //to be consumed for special attacks
+    private int basic_attack_counter_for_statistics; // for player statistics since we consume basic attacks for special attacks and don't get the accurate count for player stats
     private int basic_attack_dmg_done; //amount of basic attack damage the player has done
     private int special_attack_dmg_done; //amount of special attack damage the player has done
 
@@ -47,6 +47,10 @@ public class Fighter {
         return special_attack_dmg_done;
     }
 
+    public int getBasicAttacksCountForStatistics(){
+        return basic_attack_counter_for_statistics;
+    }
+
     //setters
     public void setHp(int hp){
         this.hp = hp;
@@ -74,6 +78,10 @@ public class Fighter {
 
     public void setSpecialAttackDamageDone(int special_attack_dmg_done){
         this.special_attack_dmg_done = special_attack_dmg_done;
+    }
+
+    public void setBasicAttackCountForStatistics(int basic_attack_counter_for_statistics){
+        this.basic_attack_counter_for_statistics = basic_attack_counter_for_statistics;
     }
     //might need a method for clearing out previous champ choices in case the player wants to player more than one game
 }
