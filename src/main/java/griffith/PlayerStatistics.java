@@ -18,6 +18,7 @@ public class PlayerStatistics implements Serializable{
     public int games_played;
     public int games_won;
     public int games_lost;
+    public int games_drawn;
     //do the rest later
 
     public void addStats(Fighter attacker, Fighter defender){

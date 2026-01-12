@@ -1,23 +1,23 @@
 package griffith;
 
-import java.io.EOFException;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.ObjectStreamClass;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 import java.util.InputMismatchException;
 import java.util.Random;
 
 public class assignmentOne {
-
-	// static int random_fighter = new Random().nextInt(1,5);
+	//TODO order the variables here so that they make sense
+	static int total_menu_choices = 4;
 	static Scanner scanner = new Scanner(System.in);
 	static String[] available_attacks = { "Basic attack", "Special attack" };
 	static int basic_attacks_needed = 3;
@@ -28,39 +28,26 @@ public class assignmentOne {
 	final static boolean PLAYER = true;
 	final static boolean NON_PLAYER = false;
 
-	static String[] fighter_options = { "Aatrox", "Kayn", "Kayle", "Pantheon" };
+	static String[] fighter_options = {"Aatrox", "Kayn", "Kayle", "Pantheon"};
 
-	static File file = new File("src/files/player_statistics.txt");
+	static File save_dir = new File(System.getProperty("user.home"), ".theground"); //we create a directory in the user's home folder
+	static boolean result = save_dir.mkdir(); //we then save that directory
+	static File file = new File(save_dir,"player_statistics.dat"); //we create player_statistics.dat in that same folder. this way the program supports multi-platform creation of player statistics
+	//if we were to use user.dir instead, then the program would launch from wherever it's saved and not the user's home folder making player_statistics potentially move around. which would be unwanted/annoying behaviour
 
 	static PlayerStatistics stats = new PlayerStatistics();
-	
 
-	// maybe let the computer to play the same character as the player and in that
-	// case just delete this
-	public static String[] removeChosenCharacter(String[] array, int remove_index) {
-		/*
-		 * if (array == null || remove_index < 0 || remove_index >= array.length){
-		 * return array;
-		 * } idk what this si for check later
-		 */
+	final static int LOSE = 0;
+	final static int WIN = 1;
+	final static int DRAW = 2;
 
-		String updated_fighter_list[] = new String[array.length - 1];
-
-		// Copy the elements except the index
-		// from original array to the other array
-		for (int i = 0, k = 0; i < array.length; i++) {
-			if (i == remove_index)
-				continue;
-
-			updated_fighter_list[k++] = array[i];
-		}
-		return updated_fighter_list;
-	}
+	static int combat_outcome;
+	static int random_bot;
+	static int random_player_fighter;
 
 	public static void basicAttack(Fighter attacker, Fighter defender, boolean count, boolean player) {
 		int dmg_done =  (attacker.getAtk() / defender.getDef());
 		defender.setHp(defender.getHp() - dmg_done);
-		//Fighter.setBasicAttackDamageDone(dmg_done);
 		if (count) {
 			attacker.setBasicAttackCount(attacker.getBasicAttacksCount() + 1);
 			attacker.setBasicAttackCountForStatistics(attacker.getBasicAttacksCountForStatistics() + 1);
@@ -68,22 +55,30 @@ public class assignmentOne {
 		if(player){
 			attacker.setBasicAttackDamageDone(attacker.getBasicAttackDamageDone() + dmg_done);
 		}
+		if(!player){
+			//TODO add bot stats
+		}
 	}
 
-	public static void specialAttack(Fighter attacker, Fighter defender, boolean player) { //TODO make the bot always use special attack when it's up
+	public static void specialAttack(Fighter attacker, Fighter defender, boolean player) { 
 	int dmg_done = 0;
 		if (attacker.getChampion().equals("Aatrox")) { 
-			dmg_done = (attacker.getAtk() / defender.getDef()) * 2;
+			dmg_done = (attacker.getAtk() / defender.getDef()) * 3; //aatrox special attack deals 6 dmg
 			defender.setHp(defender.getHp() - dmg_done );
-			attacker.setHp(attacker.getHp() + 15);
+			attacker.setHp(attacker.getHp() + dmg_done); //aatrox heals 6 hp per special attack
 		} else if (attacker.getChampion().equals("Kayle")) {
 			dmg_done = (attacker.getAtk() / (defender.getDef() / 2));
 			defender.setHp(defender.getHp() - dmg_done);
 
 		//Patheon and Kayn just affect enemy stats and then basic attack. Which is why they're not contributing to the specialAttackDamage Counter
 		} else if (attacker.getChampion().equals("Kayn")) {
-			defender.setDef(defender.getDef() - 1); // maybe modify how much defence they lose later on. TODO also fix ArithmeticException :3
-			basicAttack(attacker, defender, NO_METER, NON_PLAYER); 
+			try{
+				defender.setDef(defender.getDef() - 3); // maybe modify how much defence they lose later on. 
+				basicAttack(attacker, defender, NO_METER, NON_PLAYER); 
+			}
+			catch(ArithmeticException e){
+				defender.setDef(-1); //this isn't the best way to handle this since the defender loses 1 armor for no reason
+			}	
 
 		} else if (attacker.getChampion().equals("Pantheon")) {
 			attacker.setAtk(attacker.getAtk() + 5); // maybe modify how much attack they gain later on
@@ -95,14 +90,15 @@ public class assignmentOne {
 			attacker.setSpecialAttackDamageDone(attacker.getSpecialAttackDamageDone() + dmg_done);
 		}
 
+		if(!player){
+			//TODO add bot stats
+		}
+
 		// continue
 	}
-
-	//TODO was gonna write some comment about creating a method but forgot what the method was gonna be about
-
-	public static boolean combatLogic(String[] fighter_options, int fighter_choice, int random_bot) {
+	public static int combatLogic(String[] fighter_options, int fighter_choice, int random_bot) {
 		int turn = 1;
-		boolean player_won = false;
+		int player_won = 0;
 		Fighter player_figther = new Fighter(100, 10, 5, fighter_options[fighter_choice]);
 		Fighter bot_figther = new Fighter(100, 10, 5, fighter_options[random_bot]);
 		do {
@@ -112,8 +108,7 @@ public class assignmentOne {
 			for (int i = 0; i < available_attacks.length; i++) {
 				System.out.print(String.format("%d.%s ", (i + 1), available_attacks[i]));
 			}
-			// System.out.println("1.Basic Attack, 2.Special Attack"); // TODO make this
-			// into ASCII later
+			// System.out.println("1.Basic Attack, 2.Special Attack"); // TODO make this into ASCII later
 			int attack_choice;
 			try {
 				attack_choice = scanner.nextInt();
@@ -123,18 +118,10 @@ public class assignmentOne {
 				continue;
 			}
 			scanner.nextLine();
-			if (attack_choice > 0 && attack_choice <= 2) { // TODO adjust attack_choice range once
-															// we
-															// got all the attack types
-				switch (attack_choice) { // TODO maybe add an option to quit game
+			if (attack_choice > 0 && attack_choice <= 2) { // TODO adjust attack_choice range once we got all the attack types
+				switch (attack_choice) { 
 					case 1 -> {
 						basicAttack(player_figther, bot_figther, COUNT_METER, PLAYER);
-						System.out.println(
-								"basic attack count is: " + player_figther.getBasicAttacksCount()); // remove
-																									// after
-																									// testing
-																									// is
-																									// complete
 						break;
 					}
 					case 2 -> {
@@ -146,77 +133,58 @@ public class assignmentOne {
 							continue;
 						} else {
 							specialAttack(player_figther, bot_figther, PLAYER);
-							player_figther.setBasicAttackCount(player_figther.getBasicAttacksCount() - basic_attacks_needed); // special
-																									// attacks
-																									// consume
-																									// the
-																									// basic-attack
-																									// meter
-							// System.out.println("basic attack count value after special attack is:
-							// " +
-							// player_figther.getBasicAttacksCount());
+							player_figther.setBasicAttackCount(player_figther.getBasicAttacksCount() - basic_attacks_needed); // special attacks consume the basic-attack meter
 						}
 						break;
 					}
+				}				
+				System.out.println("Bot basic attacks count is: " + bot_figther.getBasicAttacksCount());
+
+				if(bot_figther.getBasicAttacksCount() == basic_attacks_needed){
+					specialAttack(bot_figther, player_figther, NON_PLAYER);
+					bot_figther.setBasicAttackCount(bot_figther.getBasicAttacksCount() - basic_attacks_needed); // special attacks consume the basic attack meter
+					System.out.println("Bot Special Attacked!");
 				}
-				int random_attack = new Random().nextInt(1, 3); // TODO adjust range once all
-																// attacks
-																// have been added. num range 1-2.
-																// consider moving it to main while
-																// loop
-				switch (random_attack) {
-					case 1 -> {
-						basicAttack(bot_figther, player_figther, COUNT_METER, NON_PLAYER);
-						break;
-					}
-					case 2 -> {
-						if (bot_figther.getBasicAttacksCount() != basic_attacks_needed) {
-							basicAttack(bot_figther, player_figther, COUNT_METER, NON_PLAYER);
-						} else {
-							specialAttack(bot_figther, player_figther, NON_PLAYER);
-							bot_figther.setBasicAttackCount(
-									bot_figther.getBasicAttacksCount() - basic_attacks_needed); // special
-																								// attacks
-																								// consume
-																								// the
-																								// basic-attack
-																								// meter
-						}
-						break;
-					}
-				}
-				System.out.println(
-						String.format("Bot chose to use %s!\n",
-								available_attacks[random_attack - 1]));
+				else if (bot_figther.getBasicAttacksCount() != basic_attacks_needed) {
+					basicAttack(bot_figther, player_figther, COUNT_METER, NON_PLAYER);
+					System.out.println("Bot basic attacked!");
+				} 
 			} else {
 				System.out.println("Please choose a viable attack!");
 				continue;
 			}
 
-			// increase turn count by 1
-			turn++;
+			
+			turn++; // increase turn count by 1
+			
 			// print out updated player and bot stats
 			System.out.println(String.format("Player Stats: Hp: %s, Atk: %s, Def: %s",
 					player_figther.getHp(), player_figther.getAtk(), player_figther.getDef()));
 			System.out.println(String.format("Bot Stats: Hp: %s, Atk: %s, Def: %s\n",
 					bot_figther.getHp(), bot_figther.getAtk(), bot_figther.getDef()));
 
-			if (player_figther.getHp() <= 0) {
-				player_won = false; // idk maybe edit this or player_won initialization
+			if(player_figther.getHp() <= 0 && bot_figther.getHp() <= 0){
+				player_won = DRAW;
+			}
+			else if (player_figther.getHp() <= 0) {
+				player_won = LOSE;
 			} else if (bot_figther.getHp() <= 0) {
-				player_won = true;
+				player_won = WIN;
 			}
 
 		} while (player_figther.getHp() > 0 && bot_figther.getHp() > 0); // keep going until either player or bot wins
 		stats.addStats(player_figther, bot_figther); //update combat stats after round
 
-		//update games played/won
+		//update games played/won/drawn
 		stats.games_played++;
-		if(player_won){
+		if(player_won == WIN){
 			stats.games_won++;
 		}
-		else{
+		else if(player_won == LOSE){
 			stats.games_lost++;
+		}
+		else if(player_won == DRAW){
+			stats.games_drawn++;
 		}
 
 		saveStats(); //update player statistics 
@@ -234,7 +202,6 @@ public class assignmentOne {
 
 		return rerun;
 	}
-	int random_player_fighter = new Random().nextInt(fighter_options.length); // num range: 1-3*/
 	
 	public static int randomFighter(){ // making random_fighter into static wouldn't be able to change each time, the player wishes to re-fight in random mode, hence why this method exists
 		int random_fighter = new Random().nextInt(fighter_options.length); // num range: 1-3
@@ -242,7 +209,9 @@ public class assignmentOne {
 	}
 
 	public static void saveStats(){
+
 		try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+			//File fileFromPath = player_stats.toFile();
 			oos.writeObject(stats);
 			//oos.close();
 		} catch (FileNotFoundException e) {
@@ -267,39 +236,33 @@ public class assignmentOne {
 				stats = new PlayerStatistics();
 				e.printStackTrace();
 			} 
+		}
+
+	public static String loadAscii(String filepath){
+		try (InputStream input_stream = assignmentOne.class.getResourceAsStream(String.format("/ascii/%s.txt", filepath))) {
+		String result = null;
+			if(input_stream != null){
+				result = new BufferedReader(new InputStreamReader(input_stream)).lines().collect(Collectors.joining("\n"));
+			}
+		return result;
+		}
+		catch (IOException e) {
+			return null;
+		}
 	}
 
 	public static void main(String[] args) {
 		loadStats(); //load player statistics at game start
-
-		 // TODO ASCII art of champions + their
-																				// names in borders
 		while (true) {
-
-			
-			
-			/*
-			 * File myObj = new File("src/files/menu.txt");
-			 * 
-			 * try (Scanner myReader = new Scanner(myObj)) {
-			 * while (myReader.hasNextLine()) {
-			 * String data = myReader.nextLine();
-			 * System.out.println(data);
-			 * }
-			 * } 3
-			 * catch (FileNotFoundException e) {
-			 * System.out.println("An error occurred.");
-			 * e.printStackTrace();
-			 * }
-			 */
-
-			System.out.println("Choose options from 1 to 5: "); // TODO maybe make the 1-5, not static
+			System.out.println(loadAscii("logo"));
+			System.out.println(loadAscii("menu"));
+			System.out.print(String.format("Choose options (from 1 to %s): ", total_menu_choices)); 
 			int menu_choice;
-
 			try {
-				menu_choice = scanner.nextInt(); // TODO. players are able to enter an out of range number and the
-													// program prompts them to enter a choice again, which is fine but
-													// maybe consider giving players an error message
+				menu_choice = scanner.nextInt(); 
+				if (menu_choice > total_menu_choices || menu_choice < 0){
+					System.out.println("Choice out of range!\n");
+				}																
 			} catch (InputMismatchException e) {
 				System.out.println("Please use numbers for the menu choice!");
 				scanner.nextLine();
@@ -318,12 +281,13 @@ public class assignmentOne {
 					System.out.println("Choose a character(C) or play a random(R) one?");
 
 					String random_choice_or_not = scanner.nextLine().replaceAll("\\s+", "").toUpperCase();
-					while (true) { // in case the user uses a character that's not a number for the character
-									// choise, we'll keep asking them to do so
+					while (true) { 
+									
 						if (random_choice_or_not.equals("C")) {
 							System.out.println("You can choose from: \n");
 							for (int i = 0; i < fighter_options.length; i++) {
 								System.out.println((i + 1) + "." + fighter_options[i]);
+								System.out.println(loadAscii(fighter_options[i])+"\n");
 							}
 
 							System.out.println("Make your choice! \n");
@@ -339,9 +303,9 @@ public class assignmentOne {
 								continue;
 							}
 
+							random_bot = randomFighter(); //we assign a random value generated by randomFighter(). if we don't the program will print out e.g "Bot fighter is: Kayn" while the actual bot fighter might be "Aatrox" due to how I've made randomFighter() work.
 							try {
-								System.out.println(String.format("Player fighter: %s \nBot fighter: %s",
-										fighter_options[fighter_choice], fighter_options[randomFighter()])); 
+								System.out.println(String.format("Player fighter: %s \nBot fighter: %s", fighter_options[fighter_choice], fighter_options[random_bot])); 
 							} catch (ArrayIndexOutOfBoundsException e) {
 								System.out.println("Choice out of range!");
 								scanner.nextLine();
@@ -349,15 +313,18 @@ public class assignmentOne {
 							}
 							scanner.nextLine();
 							
+							combat_outcome = combatLogic(fighter_options, fighter_choice, random_bot); //after the fight is done, we assign a value to combat_outcome and use it for the following conditional checks
 
-							if (combatLogic(fighter_options, fighter_choice, randomFighter())) { 
+							if (combat_outcome == WIN) { 
 								System.out.println("Player won!");
-							} else {
+							} else if(combat_outcome == LOSE) {
 								System.out.println("Bot won!");
+							}
+							else if (combat_outcome == DRAW){
+								System.out.println("It's a Draw!");
 							}
 
 							// TODO after combat message + "fight again" logic should be a method since both game modes will need it
-							//String fight_on;
 							System.out.print("\nWould you like to continue fighting(r) or click any other key to go back to menu? ");
 							String fight_on = scanner.nextLine().replaceAll("\\s+", "").toLowerCase(); 
 
@@ -369,28 +336,29 @@ public class assignmentOne {
 						}
 
 						else if (random_choice_or_not.equals("R")) {
-							
-							System.out.println(String.format("Player fighter is: %s",fighter_options[randomFighter()]));
-							System.out.println(String.format("Bot fighter is: %s",fighter_options[randomFighter()]));
+							random_bot = randomFighter();
+							random_player_fighter = randomFighter();
+							System.out.println(String.format("Player fighter: %s \nBot fighter: %s", fighter_options[random_player_fighter], fighter_options[random_bot])); 
 
-							if (combatLogic(fighter_options, randomFighter(), randomFighter())) { 
+							combat_outcome = combatLogic(fighter_options, random_player_fighter, random_bot);
+
+							if (combat_outcome == WIN) { 
 								System.out.println("Player won!");
-							} else {
+							} else if(combat_outcome == LOSE) {
 								System.out.println("Bot won!");
-							}				
-							//String fight_on;
+							}
+							else if (combat_outcome == DRAW){
+								System.out.println("It's a Draw!");
+							}
+
 							System.out.print("\nWould you like to continue fighting(r) or click any other key to go back to menu? ");
 							String fight_on = scanner.nextLine().replaceAll("\\s+", "").toLowerCase();
 							
-
 							if (continue_fight(fight_on)) {
 								continue;
 							} else {
 								break;
 							}		
-
-							//System.out.println(fighter_options[random_fighter]);
-							//break;
 						}
 
 						else {
@@ -402,11 +370,6 @@ public class assignmentOne {
 				}
 
 				case 3 -> {
-					// settings
-				}
-
-				case 4 -> {
-					// player statistics
 					//maybe transfer code into method
 					System.out.println("Basic damage done: " + stats.basic_attack_dmg_done);
 					System.out.println("Special damage done: " + stats.special_attack_dmg_done);
@@ -414,15 +377,13 @@ public class assignmentOne {
 					System.out.println("Games played: " + stats.games_played);
 					System.out.println("Games won: " + stats.games_won);
 					System.out.println("Games lost: " + stats.games_lost);
+					System.out.println("Games drawn: " + stats.games_drawn);
 				}
 
-				case 5 -> {
+				case 4 -> {
 					return;
 				}
 			}
-
-			// return;
 		}
 	}
-
 }
