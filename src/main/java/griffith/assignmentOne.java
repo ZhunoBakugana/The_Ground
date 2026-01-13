@@ -71,24 +71,27 @@ public class assignmentOne {
 	public static void specialAttack(Fighter attacker, Fighter defender, boolean count, boolean player) { 
 	int dmg_done = 0;
 	int dmg_blocked = 0;
+	int hp_healed = 0;
 		if (attacker.getChampion().equals("Aatrox")) { 
-			dmg_done = (attacker.getAtk() / defender.getDef()) * 2; //aatrox special attack deals 6 dmg
+			dmg_done = (attacker.getAtk() / defender.getDef()) * 2; 
 			dmg_blocked = (attacker.getAtk() - dmg_done);
+			hp_healed = dmg_done;
 			defender.setHp(defender.getHp() - dmg_done );
-			attacker.setHp(attacker.getHp() + dmg_done); //aatrox heals 6 hp per special attack
+			attacker.setHp(attacker.getHp() + hp_healed); 
 		} else if (attacker.getChampion().equals("Kayle")) {
 			dmg_done = (attacker.getAtk() / (defender.getDef() / 2));
 			dmg_blocked = (attacker.getAtk() -dmg_done);
 			defender.setHp(defender.getHp() - dmg_done);
 
 		//Patheon and Kayn just affect enemy stats and then basic attack. Which is why they're not contributing to the specialAttackDamage Counter
-		} else if (attacker.getChampion().equals("Kayn")) { //TODO fix Kayn, he just heals the enemy for no reason xD
+		} else if (attacker.getChampion().equals("Kayn")) { //TODO if def is to go down make it so it just stays at 1
+
 			try{
 				defender.setDef(defender.getDef() - 3); // maybe modify how much defence they lose later on. 
 				//basicAttack(attacker, defender, NO_METER, NON_PLAYER); 
 				dmg_done = (attacker.getAtk() / defender.getDef());
 				dmg_blocked = (attacker.getAtk() - dmg_done);
-				defender.setHp(defender.getHp() / dmg_done);
+				defender.setHp(defender.getHp() - dmg_done);
 			}
 			catch(ArithmeticException e){
 				defender.setDef(-1); //this isn't the best way to handle this since the defender loses 1 armor for no reason
@@ -109,7 +112,8 @@ public class assignmentOne {
 
 		if(player){
 			attacker.setSpecialAttackDamageDone(attacker.getSpecialAttackDamageDone() + dmg_done);
-
+			attacker.setHpHealed(attacker.getHpHealed() + hp_healed);
+			System.out.println("Total hp healed is: " + attacker.getHpHealed());
 		}
 
 		else if(!player){
@@ -123,6 +127,7 @@ public class assignmentOne {
 	public static int combatLogic(String[] fighter_options, int fighter_choice, int random_bot) {
 		int turn = 1;
 		int player_won = 0;
+		//TODO adjust Fighter object in-game values
 		Fighter player_figther = new Fighter(100, 10, 5, fighter_options[fighter_choice]);
 		Fighter bot_figther = new Fighter(100, 10, 5, fighter_options[random_bot]);
 		do {
@@ -407,6 +412,7 @@ public class assignmentOne {
 					System.out.println("Games lost: " + stats.games_lost);
 					System.out.println("Games drawn: " + stats.games_drawn);
 					System.out.println("Total games played: " + (stats.games_won + stats.games_lost + stats.games_drawn));
+					System.out.println("Health points healed: " + stats.hp_healed);
 				}
 
 				case 4 -> {

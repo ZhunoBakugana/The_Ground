@@ -14,7 +14,7 @@ public class PlayerStatistics implements Serializable{
     public int basic_attack_counter;
     public int special_attack_counter;
     public int total_dmg_done; 
-    public int hp_healed; //TODO add healing stat
+    public int hp_healed;
     //public int games_played;
     public int games_won;
     public int games_lost;
@@ -31,6 +31,7 @@ public class PlayerStatistics implements Serializable{
 
         basic_attack_dmg_blocked += attacker.getBasicAttackDamageBlocked();
         special_attack_dmg_blocked += attacker.getSpecialAttackDamageBlocked();
+        hp_healed += attacker.getHpHealed();
         
     } 
 }

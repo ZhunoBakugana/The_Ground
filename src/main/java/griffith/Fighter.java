@@ -6,7 +6,7 @@ public class Fighter {
     private int def;
     private String champion;
 
-    private int basic_attack_counter; //to be consumed for special attacks
+    private int basic_attack_counter; 
     private int basic_attack_counter_for_statistics; // for player statistics since we consume basic attacks for special attacks and don't get the accurate count for player stats
     private int basic_attack_dmg_done;
     private int special_attack_dmg_done; 
@@ -15,6 +15,7 @@ public class Fighter {
     private int special_attack_dmg_blocked;
 
     private int special_attack_counter;
+    private int hp_healed;
 
     public Fighter(int hp, int atk, int def, String champion){
         this.hp = hp;
@@ -68,6 +69,10 @@ public class Fighter {
         return special_attack_counter;
     }
 
+    public int getHpHealed(){
+        return hp_healed;
+    }
+
     //setters
     public void setHp(int hp){
         this.hp = hp;
@@ -113,4 +118,7 @@ public class Fighter {
         this.special_attack_counter = special_attack_counter;
     }
     
+    public void setHpHealed(int hp_healed){
+        this.hp_healed = hp_healed;
+    }
 }
