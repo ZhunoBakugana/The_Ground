@@ -47,34 +47,48 @@ public class assignmentOne {
 
 	public static void basicAttack(Fighter attacker, Fighter defender, boolean count, boolean player) {
 		int dmg_done =  (attacker.getAtk() / defender.getDef());
+		int dmg_blocked = 0;
 		defender.setHp(defender.getHp() - dmg_done);
 		if (count) {
 			attacker.setBasicAttackCount(attacker.getBasicAttacksCount() + 1);
 			attacker.setBasicAttackCountForStatistics(attacker.getBasicAttacksCountForStatistics() + 1);
 		}
-		if(player){
+		if(player){ //
 			attacker.setBasicAttackDamageDone(attacker.getBasicAttackDamageDone() + dmg_done);
+			
+			
+			//System.out.println("basic attack damage done: " + dmg_done);
 		}
-		if(!player){
-			//TODO add bot stats
+		else if(!player){ //if the player is the defender
+			//attacker.setBasicAttackDamageDone(attacker.getBasicAttackDamageDone() + dmg_done);
+			dmg_blocked = (attacker.getAtk() - dmg_done);
+			defender.setBasicAttackDamageBlocked(defender.getBasicAttackDamageBlocked() + dmg_blocked);
+			
+			//System.out.println("basic attack dmg blocked: " + defender.getBasicAttackDamageBlocked());
 		}
 	}
 
-	public static void specialAttack(Fighter attacker, Fighter defender, boolean player) { 
+	public static void specialAttack(Fighter attacker, Fighter defender, boolean count, boolean player) { 
 	int dmg_done = 0;
+	int dmg_blocked = 0;
 		if (attacker.getChampion().equals("Aatrox")) { 
 			dmg_done = (attacker.getAtk() / defender.getDef()) * 2; //aatrox special attack deals 6 dmg
+			dmg_blocked = (attacker.getAtk() - dmg_done);
 			defender.setHp(defender.getHp() - dmg_done );
 			attacker.setHp(attacker.getHp() + dmg_done); //aatrox heals 6 hp per special attack
 		} else if (attacker.getChampion().equals("Kayle")) {
 			dmg_done = (attacker.getAtk() / (defender.getDef() / 2));
+			dmg_blocked = (attacker.getAtk() -dmg_done);
 			defender.setHp(defender.getHp() - dmg_done);
 
 		//Patheon and Kayn just affect enemy stats and then basic attack. Which is why they're not contributing to the specialAttackDamage Counter
-		} else if (attacker.getChampion().equals("Kayn")) {
+		} else if (attacker.getChampion().equals("Kayn")) { //TODO fix Kayn, he just heals the enemy for no reason xD
 			try{
 				defender.setDef(defender.getDef() - 3); // maybe modify how much defence they lose later on. 
-				basicAttack(attacker, defender, NO_METER, NON_PLAYER); 
+				//basicAttack(attacker, defender, NO_METER, NON_PLAYER); 
+				dmg_done = (attacker.getAtk() / defender.getDef());
+				dmg_blocked = (attacker.getAtk() - dmg_done);
+				defender.setHp(defender.getHp() / dmg_done);
 			}
 			catch(ArithmeticException e){
 				defender.setDef(-1); //this isn't the best way to handle this since the defender loses 1 armor for no reason
@@ -82,16 +96,26 @@ public class assignmentOne {
 
 		} else if (attacker.getChampion().equals("Pantheon")) { 
 			attacker.setAtk(attacker.getAtk() + 2); // maybe modify how much attack they gain later on
-			basicAttack(attacker, defender, NO_METER, NON_PLAYER);
+			dmg_done = (attacker.getAtk() / defender.getDef());
+			dmg_blocked = (attacker.getAtk() - dmg_done);
+			defender.setHp(defender.getHp() - dmg_done);
+			//basicAttack(attacker, defender, NO_METER, NON_PLAYER);
 		}
-		//TODO think about NON_PLAYER here
+		
+
+		if(count){
+			attacker.setSpecialAttacksCount(attacker.getSpecialAttacksCount() + 1);
+		}
 
 		if(player){
 			attacker.setSpecialAttackDamageDone(attacker.getSpecialAttackDamageDone() + dmg_done);
+
 		}
 
-		if(!player){
-			//TODO add bot stats
+		else if(!player){
+			
+			defender.setSpecialAttackDamageBlocked(defender.getSpecialAttackDamageBlocked() + dmg_blocked);
+			//System.out.println("special attack dmg blocked: " + defender.getSpecialAttackDamageBlocked());
 		}
 
 		// continue
@@ -108,7 +132,7 @@ public class assignmentOne {
 			for (int i = 0; i < available_attacks.length; i++) {
 				System.out.print(String.format("%d.%s ", (i + 1), available_attacks[i]));
 			}
-			// System.out.println("1.Basic Attack, 2.Special Attack"); // TODO make this into ASCII later
+			
 			int attack_choice;
 			try {
 				attack_choice = scanner.nextInt();
@@ -132,22 +156,22 @@ public class assignmentOne {
 													- player_figther.getBasicAttacksCount())));
 							continue;
 						} else {
-							specialAttack(player_figther, bot_figther, PLAYER);
+							specialAttack(player_figther, bot_figther, COUNT_METER, PLAYER);
 							player_figther.setBasicAttackCount(player_figther.getBasicAttacksCount() - basic_attacks_needed); // special attacks consume the basic-attack meter
 						}
 						break;
 					}
 				}				
-				System.out.println("Bot basic attacks count is: " + bot_figther.getBasicAttacksCount());
+				//System.out.println("Bot basic attacks count is: " + bot_figther.getBasicAttacksCount());
 
 				if(bot_figther.getBasicAttacksCount() == basic_attacks_needed){
-					specialAttack(bot_figther, player_figther, NON_PLAYER);
+					specialAttack(bot_figther, player_figther,NO_METER, NON_PLAYER);
 					bot_figther.setBasicAttackCount(bot_figther.getBasicAttacksCount() - basic_attacks_needed); // special attacks consume the basic attack meter
-					System.out.println("Bot Special Attacked!");
+					System.out.println("\nBot Special Attacked!\n");
 				}
 				else if (bot_figther.getBasicAttacksCount() != basic_attacks_needed) {
 					basicAttack(bot_figther, player_figther, COUNT_METER, NON_PLAYER);
-					System.out.println("Bot basic attacked!");
+					System.out.println("\nBot basic attacked!\n");
 				} 
 			} else {
 				System.out.println("Please choose a viable attack!");
@@ -176,7 +200,7 @@ public class assignmentOne {
 		stats.addStats(player_figther, bot_figther); //update combat stats after round
 
 		//update games played/won/drawn
-		stats.games_played++;
+		//stats.games_played++;
 		if(player_won == WIN){
 			stats.games_won++;
 		}
@@ -324,7 +348,6 @@ public class assignmentOne {
 								System.out.println("It's a Draw!");
 							}
 
-							// TODO after combat message + "fight again" logic should be a method since both game modes will need it
 							System.out.print("\nWould you like to continue fighting(r) or click any other key to go back to menu? ");
 							String fight_on = scanner.nextLine().replaceAll("\\s+", "").toLowerCase(); 
 
@@ -373,11 +396,17 @@ public class assignmentOne {
 					//maybe transfer code into method
 					System.out.println("Basic damage done: " + stats.basic_attack_dmg_done);
 					System.out.println("Special damage done: " + stats.special_attack_dmg_done);
+					System.out.println("Total damage done: " + (stats.basic_attack_dmg_done + stats.special_attack_dmg_done));
 					System.out.println("Basic attacks: " + stats.basic_attack_counter);
-					System.out.println("Games played: " + stats.games_played);
+					System.out.println("Special attacks: " + stats.special_attack_counter);
+					System.out.println("Total attacks: " + (stats.basic_attack_counter + stats.special_attack_counter));
+					System.out.println("Basic attacks damage blocked: " + stats.basic_attack_dmg_blocked);
+					System.out.println("Special attacks damage blocked: " + stats.special_attack_dmg_blocked);
+					System.out.println("Total damage blocked: " + (stats.basic_attack_dmg_blocked + stats.special_attack_dmg_blocked));
 					System.out.println("Games won: " + stats.games_won);
 					System.out.println("Games lost: " + stats.games_lost);
 					System.out.println("Games drawn: " + stats.games_drawn);
+					System.out.println("Total games played: " + (stats.games_won + stats.games_lost + stats.games_drawn));
 				}
 
 				case 4 -> {

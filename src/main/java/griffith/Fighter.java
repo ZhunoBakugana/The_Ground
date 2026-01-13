@@ -8,8 +8,13 @@ public class Fighter {
 
     private int basic_attack_counter; //to be consumed for special attacks
     private int basic_attack_counter_for_statistics; // for player statistics since we consume basic attacks for special attacks and don't get the accurate count for player stats
-    private int basic_attack_dmg_done; //amount of basic attack damage the player has done
-    private int special_attack_dmg_done; //amount of special attack damage the player has done
+    private int basic_attack_dmg_done;
+    private int special_attack_dmg_done; 
+
+    private int basic_attack_dmg_blocked;
+    private int special_attack_dmg_blocked;
+
+    private int special_attack_counter;
 
     public Fighter(int hp, int atk, int def, String champion){
         this.hp = hp;
@@ -51,6 +56,18 @@ public class Fighter {
         return basic_attack_counter_for_statistics;
     }
 
+    public int getBasicAttackDamageBlocked(){
+        return basic_attack_dmg_blocked;
+    }
+
+    public int getSpecialAttackDamageBlocked(){
+        return special_attack_dmg_blocked;
+    }
+
+    public int getSpecialAttacksCount(){
+        return special_attack_counter;
+    }
+
     //setters
     public void setHp(int hp){
         this.hp = hp;
@@ -83,5 +100,17 @@ public class Fighter {
     public void setBasicAttackCountForStatistics(int basic_attack_counter_for_statistics){
         this.basic_attack_counter_for_statistics = basic_attack_counter_for_statistics;
     }
-    //might need a method for clearing out previous champ choices in case the player wants to player more than one game
+
+    public void setBasicAttackDamageBlocked(int basic_attack_dmg_blocked){
+        this.basic_attack_dmg_blocked = basic_attack_dmg_blocked;
+    }
+
+    public void setSpecialAttackDamageBlocked(int special_attack_dmg_blocked){
+        this.special_attack_dmg_blocked = special_attack_dmg_blocked;
+    }
+
+    public void setSpecialAttacksCount(int special_attack_counter){
+        this.special_attack_counter = special_attack_counter;
+    }
+    
 }

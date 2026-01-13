@@ -13,17 +13,24 @@ public class PlayerStatistics implements Serializable{
     public int special_attack_dmg_done;
     public int basic_attack_counter;
     public int special_attack_counter;
-    public int total_dmg_done;
-    public int hp_healed;
-    public int games_played;
+    public int total_dmg_done; 
+    public int hp_healed; //TODO add healing stat
+    //public int games_played;
     public int games_won;
     public int games_lost;
     public int games_drawn;
+    public int basic_attack_dmg_blocked;
+    public int special_attack_dmg_blocked;
     //do the rest later
 
     public void addStats(Fighter attacker, Fighter defender){
         basic_attack_dmg_done += attacker.getBasicAttackDamageDone();
         special_attack_dmg_done += attacker.getSpecialAttackDamageDone();
         basic_attack_counter += attacker.getBasicAttacksCountForStatistics();
+        special_attack_counter += attacker.getSpecialAttacksCount();
+
+        basic_attack_dmg_blocked += attacker.getBasicAttackDamageBlocked();
+        special_attack_dmg_blocked += attacker.getSpecialAttackDamageBlocked();
+        
     } 
 }
