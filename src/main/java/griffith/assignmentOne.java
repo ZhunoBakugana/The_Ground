@@ -63,7 +63,7 @@ public class assignmentOne {
 	public static void specialAttack(Fighter attacker, Fighter defender, boolean player) { 
 	int dmg_done = 0;
 		if (attacker.getChampion().equals("Aatrox")) { 
-			dmg_done = (attacker.getAtk() / defender.getDef()) * 3; //aatrox special attack deals 6 dmg
+			dmg_done = (attacker.getAtk() / defender.getDef()) * 2; //aatrox special attack deals 6 dmg
 			defender.setHp(defender.getHp() - dmg_done );
 			attacker.setHp(attacker.getHp() + dmg_done); //aatrox heals 6 hp per special attack
 		} else if (attacker.getChampion().equals("Kayle")) {
@@ -80,8 +80,8 @@ public class assignmentOne {
 				defender.setDef(-1); //this isn't the best way to handle this since the defender loses 1 armor for no reason
 			}	
 
-		} else if (attacker.getChampion().equals("Pantheon")) {
-			attacker.setAtk(attacker.getAtk() + 5); // maybe modify how much attack they gain later on
+		} else if (attacker.getChampion().equals("Pantheon")) { 
+			attacker.setAtk(attacker.getAtk() + 2); // maybe modify how much attack they gain later on
 			basicAttack(attacker, defender, NO_METER, NON_PLAYER);
 		}
 		//TODO think about NON_PLAYER here
