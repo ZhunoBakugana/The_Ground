@@ -1,3 +1,4 @@
+//Zhulien Mobin - 3191549
 package griffith;
 import java.io.Serializable;
 
@@ -21,17 +22,14 @@ public class PlayerStatistics implements Serializable{
     public int games_drawn;
     public int basic_attack_dmg_blocked;
     public int special_attack_dmg_blocked;
-    //do the rest later
 
     public void addStats(Fighter attacker, Fighter defender){
         basic_attack_dmg_done += attacker.getBasicAttackDamageDone();
         special_attack_dmg_done += attacker.getSpecialAttackDamageDone();
         basic_attack_counter += attacker.getBasicAttacksCountForStatistics();
         special_attack_counter += attacker.getSpecialAttacksCount();
-
         basic_attack_dmg_blocked += attacker.getBasicAttackDamageBlocked();
         special_attack_dmg_blocked += attacker.getSpecialAttackDamageBlocked();
         hp_healed += attacker.getHpHealed();
-        
     } 
 }

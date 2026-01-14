@@ -1,3 +1,4 @@
+//Zhulien Mobin - 3191549
 package griffith;
 
 public class Fighter {
@@ -5,15 +6,12 @@ public class Fighter {
     private int atk;
     private int def;
     private String champion;
-
     private int basic_attack_counter; 
-    private int basic_attack_counter_for_statistics; // for player statistics since we consume basic attacks for special attacks and don't get the accurate count for player stats
+    private int basic_attack_counter_for_statistics; // since we consume basic attacks for special attacks we wouldn't get the accurate basic attack count otherwise
     private int basic_attack_dmg_done;
     private int special_attack_dmg_done; 
-
     private int basic_attack_dmg_blocked;
     private int special_attack_dmg_blocked;
-
     private int special_attack_counter;
     private int hp_healed;
 
@@ -86,9 +84,9 @@ public class Fighter {
         this.def = def;
     }
 
-    public void setChampion(String champion){ //maybe won't need
+    /*public void setChampion(String champion){
         this.champion = champion;
-    }
+    }*/
 
     public void setBasicAttackCount(int basic_attack_counter){
         this.basic_attack_counter = basic_attack_counter;
