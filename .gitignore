@@ -1,8 +1,4 @@
-# Compiled Java files
-*.class
-
 # Build output
-/bin/
 /out/
 /target/
 
@@ -10,8 +6,6 @@
 .idea/
 .vscode/
 *.iml
-.project
-.classpath
 .settings/
 
 # OS files

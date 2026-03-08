@@ -1,4 +1,3 @@
-//Zhulien Mobin - 3191549
 package griffith;
 
 public class Fighter {
